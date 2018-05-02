@@ -1,0 +1,55 @@
+import pygame
+import random
+from pygame.locals import *
+
+pygame.init()
+
+screen = pygame.display.set_mode((1000,500))
+pygame.display.set_caption('Evolution, Chandler Supple')
+
+orange_brown = (255, 153, 0)
+brown = (153, 51, 0)
+light_backing = (255, 255, 102)
+dark_brown = (77, 57, 0)
+white = (255,255,255)
+
+clock = pygame.time.Clock()
+
+def gameboard():
+    for i in range(0, 12):
+        pygame.draw.rect(screen, orange_brown, (0, ((i * 20) + (i * 20) + 20), 20, 20), 0)
+        pygame.draw.rect(screen, brown, (980, ((i * 20) + (i * 20) + 20), 20, 20), 0)
+        pygame.draw.rect(screen, brown, (0, ((i * 20) + (i * 20)), 20, 20), 0)
+        pygame.draw.rect(screen, orange_brown, (980, ((i * 20) + (i * 20)), 20, 20), 0)
+        
+    for i in range(0, 25):
+        pygame.draw.rect(screen, orange_brown, (((i * 20) + (i * 20) + 20), 0, 20, 20), 0)
+        pygame.draw.rect(screen, orange_brown, (((i * 20) + (i * 20) + 20), 480, 20, 20), 0)
+        pygame.draw.rect(screen, brown, (((i * 20) + (i * 20)), 0, 20, 20), 0)
+        pygame.draw.rect(screen, brown, (((i * 20) + (i * 20)), 480, 20, 20), 0)
+        
+    for i in range(0, 6):
+        pygame.draw.rect(screen, white, (((50 * i) + (i * 18) + 50), 50, 60, 100), 0)
+            
+    pygame.draw.rect(screen, light_backing, (20, 20, 960, 460), 0)
+    
+    # make dice
+    
+    # add title
+
+    
+# def environment(dice_roll):
+    
+# class Sprite:
+    
+# class Enemy:
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            
+    gameboard()
+            
+    pygame.display.flip()
+    clock.tick(30)
