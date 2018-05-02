@@ -12,10 +12,20 @@ brown = (153, 51, 0)
 light_backing = (255, 255, 102)
 dark_brown = (77, 57, 0)
 white = (255,255,255)
+black = (0,0,0)
+blue = (0, 102, 204)
+
+x = random.randint(100, 1000)
+y = random.randint(100, 400)
+direct = 'up'
+
+enemy_count = 5
+once = 0
 
 clock = pygame.time.Clock()
 
-def gameboard():
+def gameboard(roll):
+        
     for i in range(0, 12):
         pygame.draw.rect(screen, orange_brown, (0, ((i * 20) + (i * 20) + 20), 20, 20), 0)
         pygame.draw.rect(screen, brown, (980, ((i * 20) + (i * 20) + 20), 20, 20), 0)
@@ -28,28 +38,88 @@ def gameboard():
         pygame.draw.rect(screen, brown, (((i * 20) + (i * 20)), 0, 20, 20), 0)
         pygame.draw.rect(screen, brown, (((i * 20) + (i * 20)), 480, 20, 20), 0)
         
-    for i in range(0, 6):
-        pygame.draw.rect(screen, white, (((50 * i) + (i * 18) + 50), 50, 60, 100), 0)
+        pygame.draw.rect(screen, light_backing, (20, 20, 960, 460), 0)
+        
+    for i in range(0, 5):
+        pygame.draw.rect(screen, dark_brown, ((((150 * i) + ((i * 30) + 65)), (145 + (((-1)**i) * (50))), 150, 210)), 0)
+        pygame.draw.rect(screen, orange_brown, ((((150 * i) + ((i * 30) + 65)), (145 + (((-1)**i) * (50))), 150, 210)), 3)
+    
+    pygame.draw.rect(screen, white, (850, 70, 80, 80), 0)
+    pygame.draw.rect(screen, black, (850, 70, 80, 80), 3)
             
-    pygame.draw.rect(screen, light_backing, (20, 20, 960, 460), 0)
+    # make dice (number), add title
     
-    # make dice
-    
-    # add title
+class Sprite:
+    def __init__(self, sprite_size, sprite_speed, sprite_sprint_length, direction):
+        global x, y, direct
+        self.sprite_size = sprite_size
+        self.sprite_speed = sprite_speed
+        self.sprite_sprint_length = sprite_sprint_length
+        self.x = x
+        self.y = y
+        self.direction = direction
+            
+        if direction[pygame.K_UP]:
+            self.y = self.y - self.sprite_speed
+            direct = 'up'
+        if direction[pygame.K_DOWN]:
+            self.y = self.y + self.sprite_speed
+            direct = 'down'            
+        if direction[pygame.K_RIGHT]:
+            self.x = self.x + self.sprite_speed
+            direct = 'right'            
+        if direction[pygame.K_LEFT]:
+            self.x = self.x - self.sprite_speed
+            direct = 'left'        
 
-    
-# def environment(dice_roll):
-    
-# class Sprite:
-    
-# class Enemy:
+        if direction[pygame.K_SPACE]:
+            if (direct == 'up'):
+                if (1/(sprite_sprint_length * 1000) < 1):
+                    self.y = self.y - (3 * self.sprite_speed)
+            if (direct == 'down'):
+                if (1/(sprite_sprint_length * 1000) < 1):
+                    self.y = self.y + (3 * self.sprite_speed)
+            if (direct == 'right'):
+                if (1/(sprite_sprint_length * 1000) < 1):
+                    self.x = self.x + (3 * self.sprite_speed)
+            if (direct == 'left'):
+                if (1/(sprite_sprint_length * 1000) < 1):
+                    self.x = self.x - (3 * self.sprite_speed)
+            
+        if (self.x > 1000):
+            self.x = 1000
+        if (self.x < 0):
+            self.x = 0
+        if (self.y > 500):
+            self.y = 500
+        if (self.y < 0):
+            self.y = 0
+            
+        x = self.x
+        y = self.y
+            
+        sprite = pygame.draw.circle(screen, blue, (self.x, self.y), sprite_size, 0)
+        
+#class Enemy:
+ #   def __init__(self, enemy_x, enemy_y, enemy_size_range, enemy_speed_range, enemy_color):
+        
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             
-    gameboard()
+    direction = pygame.key.get_pressed()
+          
+    if (once == 0):
+        for i in range(0, enemy_count):
+            d = {}
+            d('enemy%s' % i)
+            print(d)
+            once = 1
+        
+    gameboard(5)
+    sprite = Sprite(10, 5, 10, direction)
             
     pygame.display.flip()
     clock.tick(30)
