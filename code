@@ -100,8 +100,8 @@ class Sprite:
             
         sprite = pygame.draw.circle(screen, blue, (self.x, self.y), sprite_size, 0)
         
-#class Enemy:
- #   def __init__(self, enemy_x, enemy_y, enemy_size_range, enemy_speed_range, enemy_color):
+class Enemy:
+    def __init__(self, enemy_x, enemy_y, enemy_size_range, enemy_speed_range, enemy_color):
         
 
 while True:
@@ -111,15 +111,28 @@ while True:
             
     direction = pygame.key.get_pressed()
           
-    if (once == 0):
+    if (once1 == 0):
+        enemy_dict = {}
         for i in range(0, enemy_count):
-            d = {}
-            d('enemy%s' % i)
-            print(d)
-            once = 1
+            enemy_dict[('enemy%s' % i).format(i)] = None
+            once1 = 1
+            
+    if (once2 == 0):
+        enemy_dict = {}
+        for i in range(0, enemy_count):
+            enemy_dict[('enemy_class%s' % i).format(i)] = None
+            once2 = 1
+            
+    if (once3 == 0):
+        enemy_dict = {}
+        for i in range(0, enemy_count):
+            enemy_dict[('enemy_class%s' % i).format(i)] = None
+            once3 = 1
         
     gameboard(5)
     sprite = Sprite(10, 5, 10, direction)
+    for i in range(0, enemy_count):
+        enemy_dict[('enemy_count%s' % i)] = Enemy((('enemy_x')%s), (('enemy_y')%s), 20, 10, white) 
             
     pygame.display.flip()
     clock.tick(30)
