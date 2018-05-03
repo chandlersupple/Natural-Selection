@@ -1,74 +1,79 @@
-import pygame
-import random
+import sys 
+import pygame 
+import random 
 from pygame.locals import *
 
 # ADD FOOD, DICE, TITLE, ENVIRONMENTS, HELP PAGE
-
 pygame.init()
 
-screen = pygame.display.set_mode((1000,500))
-pygame.display.set_caption('Evolution, Chandler Supple')
+screen = pygame.display.set_mode((1000,500)) 
+pygame.display.set_caption('Natural Selection, Chandler Supple')
 
-orange_brown = (255, 153, 0)
-brown = (153, 51, 0)
-light_backing = (255, 255, 102)
-dark_brown = (77, 57, 0)
-white = (255,255,255)
-black = (0,0,0)
-blue = (0, 102, 204)
-red = (255,0,0)
+orange_brown = (255, 153, 0) 
+brown = (153, 51, 0) 
+light_backing = (255, 255, 102) 
+dark_brown = (77, 57, 0) 
+white = (255,255,255) 
+black = (0,0,0) 
+blue = (0, 102, 204) 
+red = (255,0,0) 
 orange = (255, 204, 0)
 
-x = random.randint(100, 1000)
-y = random.randint(100, 400)
-direct = 'up'
+x = random.randint(100, 1000) 
+y = random.randint(100, 400) 
 
-enemy_count = 5
-enemy_size = 20
-enemy_speed = 3
-ready = 750
-once = 0
-food_count = 20
-i = 0
-j = 0
+direct = 'up'
+enemy_count = 10 
+enemy_size = 20 
+enemy_speed = 4 
+ready = 750 
+once = 0 
+i = 0 
+none = None
+
+food_count = 5 
+j = 0 
+consumed = [] 
+consumed_count = 0 
+reset = 0
+
+verdana_font = pygame.font.SysFont("verdana", 42) 
+title_in_verdana = verdana_font.render("Natural Selection", False, (brown))
 
 clock = pygame.time.Clock()
 
 def gameboard(roll):
-        
+
     for i in range(0, 12):
         pygame.draw.rect(screen, orange_brown, (0, ((i * 20) + (i * 20) + 20), 20, 20), 0)
         pygame.draw.rect(screen, brown, (980, ((i * 20) + (i * 20) + 20), 20, 20), 0)
         pygame.draw.rect(screen, brown, (0, ((i * 20) + (i * 20)), 20, 20), 0)
         pygame.draw.rect(screen, orange_brown, (980, ((i * 20) + (i * 20)), 20, 20), 0)
-        
+
     for i in range(0, 25):
         pygame.draw.rect(screen, orange_brown, (((i * 20) + (i * 20) + 20), 0, 20, 20), 0)
         pygame.draw.rect(screen, orange_brown, (((i * 20) + (i * 20) + 20), 480, 20, 20), 0)
         pygame.draw.rect(screen, brown, (((i * 20) + (i * 20)), 0, 20, 20), 0)
         pygame.draw.rect(screen, brown, (((i * 20) + (i * 20)), 480, 20, 20), 0)
-        
+
         pygame.draw.rect(screen, light_backing, (20, 20, 960, 460), 0)
-        
+
+        screen.blit(title_in_verdana, (38, 420))
+
     for i in range(0, 5):
         pygame.draw.rect(screen, dark_brown, ((((150 * i) + ((i * 30) + 65)), (145 + (((-1)**i) * (50))), 150, 210)), 0)
         pygame.draw.rect(screen, orange_brown, ((((150 * i) + ((i * 30) + 65)), (145 + (((-1)**i) * (50))), 150, 210)), 3)
-    
+
     pygame.draw.rect(screen, white, (850, 70, 80, 80), 0)
-    pygame.draw.rect(screen, black, (850, 70, 80, 80), 3)
-            
-    # make dice (number), add title
-    
-class Sprite:
-    def __init__(self, sprite_size, sprite_speed, sprite_sprint_length, direction):
-        global x, y, direct, ready
-        self.sprite_size = sprite_size
-        self.sprite_speed = sprite_speed
-        self.sprite_sprint_length = sprite_sprint_length
-        self.x = x
-        self.y = y
-        self.direction = direction
-            
+    pygame.draw.rect(screen, brown, (850, 70, 80, 80), 3)
+
+    dice_number = verdana_font.render(str(roll), False, (brown))
+    screen.blit(dice_number, (876, 83))
+
+class Sprite: 
+    def init(self, sprite_size, sprite_speed, sprite_sprint_length, direction): 
+        global x, y, direct, ready self.sprite_size = sprite_size self.sprite_speed = sprite_speed self.sprite_sprint_length = sprite_sprint_length self.x = x self.y = y self.direction = direction
+
         if direction[pygame.K_UP]:
             self.y = self.y - self.sprite_speed
             direct = 'up'
@@ -95,7 +100,7 @@ class Sprite:
                 ready = 0
         if (ready < 750):
             ready = ready + 1
-            
+
         if (self.x > 1000):
             self.x = 1000
         if (self.x < 0):
@@ -104,63 +109,70 @@ class Sprite:
             self.y = 500
         if (self.y < 0):
             self.y = 0
-            
+
         x = self.x
         y = self.y
-            
+
         sprite = pygame.draw.circle(screen, blue, (self.x, self.y), sprite_size, 0)
         
-class Enemy:
-    def __init__(self, enemy_size_range, enemy_speed_range, color):
+class Enemy: 
+    def init(self, enemy_size_range, enemy_speed_range, color): 
         global x, y, i, once, enemy_x_dict, enemy_y_dict, enemy_count
-        
+
         self.enemy_size_range = enemy_size_range
         self.enemy_speed_range = enemy_speed_range
         self.color = color
-        
+
         dist_x = enemy_x_dict.get('enemy_x%s' % i) - x
         dist_y = enemy_y_dict.get('enemy_y%s' % i) - y
-            
+
         if (dist_x > 5 and dist_x <= 100):
             enemy_x_dict[('enemy_x%s' % i).format(i)] = enemy_x_dict.get('enemy_x%s' % i) - self.enemy_speed_range
-            if (dist_y > 5 and dist_y <= 100):
-                enemy_y_dict[('enemy_y%s' % i).format(i)] = enemy_y_dict.get('enemy_y%s' % i) - self.enemy_speed_range
-            if (dist_y < -5 and dist_y >= -100):
-                enemy_y_dict[('enemy_y%s' % i).format(i)] = enemy_y_dict.get('enemy_y%s' % i) + self.enemy_speed_range
-            
         if (dist_x < -5 and dist_y >= -100):
             enemy_x_dict[('enemy_x%s' % i).format(i)] = enemy_x_dict.get('enemy_x%s' % i) + self.enemy_speed_range
-            if (dist_y > 5 and dist_y <= 100):
-                enemy_y_dict[('enemy_y%s' % i).format(i)] = enemy_y_dict.get('enemy_y%s' % i) - self.enemy_speed_range
-            if (dist_y < -5 and dist_y >= -100):
-                enemy_y_dict[('enemy_y%s' % i).format(i)] = enemy_y_dict.get('enemy_y%s' % i) + self.enemy_speed_range
-            
+        if (dist_y > 5 and dist_y <= 100):
+            enemy_y_dict[('enemy_y%s' % i).format(i)] = enemy_y_dict.get('enemy_y%s' % i) - self.enemy_speed_range
+        if (dist_y < -5 and dist_y >= -100):
+            enemy_y_dict[('enemy_y%s' % i).format(i)] = enemy_y_dict.get('enemy_y%s' % i) + self.enemy_speed_range
+
         pygame.draw.circle(screen, self.color, (enemy_x_dict.get('enemy_x%s' % i), enemy_y_dict.get('enemy_y%s' % i)), self.enemy_size_range, 0)
-        
+
         i = i + 1
         if (i >= enemy_count):
             i = 0
         
-class Food:
-    def __init__(self, color):
-        global food_x_dict, food_y_dict, x, y, j
-        self.color = color
-                
+class Food: 
+    def init(self, color, background_color): 
+        global food_x_dict, food_y_dict, x, y, j, food_count, consumed_count, consumed, reset self.color = color self.background_color = background_color
+
+        if (abs(x - food_x_dict.get('food_x%s' % j)) <= 15 and abs(y - food_y_dict.get('food_y%s' % j)) <= 15):
+            consumed.append(j)
+            consumed_count = consumed_count + 1
+            if (j <= food_count):
+                j = j + 1
+            if (j >= food_count):
+                j = 0
+
+        if (reset >= 400):
+            for c in range (0, (len(consumed) - 1)):
+                consumed.pop(c)
+            reset = 0
+        reset = reset + 1
+
         pygame.draw.circle(screen, self.color, (food_x_dict.get('food_x%s' % j), food_y_dict.get('food_y%s' % j)), 10, 0)
-                
-        j = j + 1
-        if (j >= enemy_count):
+
+        if (j >= food_count):
             j = 0
-        
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            
+        j = j + 1
+
+while True: 
+    for event in pygame.event.get(): 
+        if event.type == pygame.QUIT: pygame.display.quit()
+
     direction = pygame.key.get_pressed()
-          
+
     if (once == 0):
-        
+
         enemy_x_dict = {}
         enemy_y_dict = {}
         enemy_speed_dict = {}    
@@ -169,7 +181,7 @@ while True:
         food_x_dict = {}
         food_y_dict = {}
         food_dict = {}
-        
+
         for i in range(0, enemy_count):
             x_init = random.randint(50, 950)
             enemy_x_dict[('enemy_x%s' % i).format(i)] = x_init
@@ -186,25 +198,23 @@ while True:
             enemy_speed_dict[('enemy_speed%s' % i).format(i)] = speed
         for j in range(0, food_count):
             food_x_init = random.randint(50, 950)
-            food_x_dict[('food_x%s' % j).format(i)] = food_x_init
+            food_x_dict[('food_x%s' % j).format(j)] = food_x_init
         for j in range(0, food_count):
             food_y_init = random.randint(50, 450)
-            food_y_dict[('food_y%s' % j).format(i)] = food_y_init
+            food_y_dict[('food_y%s' % j).format(j)] = food_y_init
         for j in range(0, food_count):
-            food_dict[('food_class%s' % j).format(i)] = None
-            
+            food_dict[('food_class%s' % j).format(j)] = None
+
             once = 1
-                        
-#    x, y = pygame.mouse.get_pos()
-#    print('x: %s' %x)
-#    print('y: %s' %y)
-        
+
     gameboard(5)
     sprite = Sprite(10, 5, 400, direction)
     for i in range(0, enemy_count):
         enemy_dict[('enemy_class%s' % i)] = Enemy(enemy_size_dict.get('enemy_size%s' % i), enemy_speed_dict.get('enemy_speed%s' % i), red) 
     for j in range(0, food_count):
-        food_dict[('food_class%s' % j)] = Food(orange) 
-            
+        food_dict[('food_class%s' % j)] = Food(orange, light_backing) 
+
     pygame.display.flip()
     clock.tick(30)
+    
+    # CHANGE THE MESSUP THINGY
