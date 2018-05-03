@@ -22,10 +22,9 @@ direct = 'up'
 
 enemy_count = 5
 enemy_size = 20
-enemy_speed = 5
+enemy_speed = 3
 once = 0
-tempy = None
-tempx = None
+i = 0
 
 clock = pygame.time.Clock()
 
@@ -106,35 +105,36 @@ class Sprite:
         sprite = pygame.draw.circle(screen, blue, (self.x, self.y), sprite_size, 0)
         
 class Enemy:
-    def __init__(self, enemy_x, enemy_y, enemy_size_range, enemy_speed_range, color):
-        global x, y, once
-        once = 2
+    def __init__(self, enemy_size_range, enemy_speed_range, color):
+        global x, y, i, once, enemy_x_dict, enemy_y_dict, enemy_count
         
-        self.enemy_x = enemy_x
-        self.enemy_y = enemy_y
         self.enemy_size_range = enemy_size_range
         self.enemy_speed_range = enemy_speed_range
         self.color = color
         
-        dist_x = x - self.enemy_x
-        dist_y = y - self.enemy_y
-        
-        if (0 <= dist_x < 40):
-            self.enemy_x = self.enemy_x + self.enemy_speed_range
-        if (0 >= dist_x > -40):
-            self.enemy_x = self.enemy_x - self.enemy_speed_range
-        if (0 <= dist_y < 40):
-            self.enemy_y = self.enemy_y + self.enemy_speed_range
-        if (0 >= dist_y > -40):
-            self.enemy_y = self.enemy_y - self.enemy_speed_range
+        dist_x = enemy_x_dict.get('enemy_x%s' % i) - x
+        dist_y = enemy_y_dict.get('enemy_y%s' % i) - y
             
-        global tempx, tempy
-        tempx = self.enemy_x
-        tempy = self.enemy_y
+        if (dist_x > 0 and dist_x <= 75):
+            enemy_x_dict[('enemy_x%s' % i).format(i)] = enemy_x_dict.get('enemy_x%s' % i) - self.enemy_speed_range
+            if (dist_y > 0 and dist_y <= 75):
+                enemy_y_dict[('enemy_y%s' % i).format(i)] = enemy_y_dict.get('enemy_y%s' % i) - self.enemy_speed_range
+            if (dist_y < 0 and dist_y >= -75):
+                enemy_y_dict[('enemy_y%s' % i).format(i)] = enemy_y_dict.get('enemy_y%s' % i) + self.enemy_speed_range
+            
+        if (dist_x < 0 and dist_y >= -75):
+            enemy_x_dict[('enemy_x%s' % i).format(i)] = enemy_x_dict.get('enemy_x%s' % i) + self.enemy_speed_range
+            if (dist_y > 0 and dist_y <= 75):
+                enemy_y_dict[('enemy_y%s' % i).format(i)] = enemy_y_dict.get('enemy_y%s' % i) - self.enemy_speed_range
+            if (dist_y < 0 and dist_y >= -75):
+                enemy_y_dict[('enemy_y%s' % i).format(i)] = enemy_y_dict.get('enemy_y%s' % i) + self.enemy_speed_range
+            
+        pygame.draw.circle(screen, self.color, (enemy_x_dict.get('enemy_x%s' % i), enemy_y_dict.get('enemy_y%s' % i)), self.enemy_size_range, 0)        
 
-        pygame.draw.circle(screen, self.color, (self.enemy_x, self.enemy_y), self.enemy_size_range, 0)
+        i = i + 1
+        if (i >= enemy_count):
+            i = 0
         
-
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -162,21 +162,19 @@ while True:
             size = random.randint(5, enemy_size)
             enemy_size_dict[('enemy_size%s' % i).format(i)] = size
         for i in range(0, enemy_count):
-            speed = random.randint(0, enemy_speed)
+            speed = random.randint(1, enemy_speed)
             enemy_speed_dict[('enemy_speed%s' % i).format(i)] = speed
             
             once = 1
-        
-    if (once == 2):
-        for i in range(0, enemy_count):
-            enemy_x_dict[('enemy_x%s' % i).format(i)] = tempx
-        for i in range(0, enemy_count):
-            enemy_y_dict[('enemy_y%s' % i).format(i)] = tempy
+                        
+#    x, y = pygame.mouse.get_pos()
+#    print('x: %s' %x)
+#    print('y: %s' %y)
         
     gameboard(5)
     sprite = Sprite(10, 5, 10, direction)
     for i in range(0, enemy_count):
-        enemy_dict[('enemy_class%s' % i)] = Enemy(enemy_x_dict.get('enemy_x%s' % i), enemy_y_dict.get('enemy_y%s' % i), enemy_size_dict.get('enemy_size%s' % i), enemy_speed_dict.get('enemy_speed%s' % i), red) 
+        enemy_dict[('enemy_class%s' % i)] = Enemy(enemy_size_dict.get('enemy_size%s' % i), enemy_speed_dict.get('enemy_speed%s' % i), red) 
             
     pygame.display.flip()
     clock.tick(30)
