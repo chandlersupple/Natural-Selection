@@ -71,8 +71,14 @@ def gameboard(roll):
     screen.blit(dice_number, (876, 83))
 
 class Sprite: 
-    def init(self, sprite_size, sprite_speed, sprite_sprint_length, direction): 
-        global x, y, direct, ready self.sprite_size = sprite_size self.sprite_speed = sprite_speed self.sprite_sprint_length = sprite_sprint_length self.x = x self.y = y self.direction = direction
+    def __init__(self, sprite_size, sprite_speed, sprite_sprint_length, direction): 
+        global x, y, direct, ready 
+        self.sprite_size = sprite_size 
+        self.sprite_speed = sprite_speed 
+        self.sprite_sprint_length = sprite_sprint_length 
+        self.x = x 
+        self.y = y 
+        self.direction = direction
 
         if direction[pygame.K_UP]:
             self.y = self.y - self.sprite_speed
@@ -116,7 +122,7 @@ class Sprite:
         sprite = pygame.draw.circle(screen, blue, (self.x, self.y), sprite_size, 0)
         
 class Enemy: 
-    def init(self, enemy_size_range, enemy_speed_range, color): 
+    def __init__(self, enemy_size_range, enemy_speed_range, color): 
         global x, y, i, once, enemy_x_dict, enemy_y_dict, enemy_count
 
         self.enemy_size_range = enemy_size_range
@@ -142,8 +148,10 @@ class Enemy:
             i = 0
         
 class Food: 
-    def init(self, color, background_color): 
-        global food_x_dict, food_y_dict, x, y, j, food_count, consumed_count, consumed, reset self.color = color self.background_color = background_color
+    def __init__(self, color, background_color): 
+        global food_x_dict, food_y_dict, x, y, j, food_count, consumed_count, consumed, reset 
+        self.color = color 
+        self.background_color = background_color
 
         if (abs(x - food_x_dict.get('food_x%s' % j)) <= 15 and abs(y - food_y_dict.get('food_y%s' % j)) <= 15):
             consumed.append(j)
@@ -216,5 +224,3 @@ while True:
 
     pygame.display.flip()
     clock.tick(30)
-    
-    # CHANGE THE MESSUP THINGY
