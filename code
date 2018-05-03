@@ -14,13 +14,18 @@ dark_brown = (77, 57, 0)
 white = (255,255,255)
 black = (0,0,0)
 blue = (0, 102, 204)
+red = (255,0,0)
 
 x = random.randint(100, 1000)
 y = random.randint(100, 400)
 direct = 'up'
 
 enemy_count = 5
+enemy_size = 20
+enemy_speed = 5
 once = 0
+tempy = None
+tempx = None
 
 clock = pygame.time.Clock()
 
@@ -101,7 +106,33 @@ class Sprite:
         sprite = pygame.draw.circle(screen, blue, (self.x, self.y), sprite_size, 0)
         
 class Enemy:
-    def __init__(self, enemy_x, enemy_y, enemy_size_range, enemy_speed_range, enemy_color):
+    def __init__(self, enemy_x, enemy_y, enemy_size_range, enemy_speed_range, color):
+        global x, y, once
+        once = 2
+        
+        self.enemy_x = enemy_x
+        self.enemy_y = enemy_y
+        self.enemy_size_range = enemy_size_range
+        self.enemy_speed_range = enemy_speed_range
+        self.color = color
+        
+        dist_x = x - self.enemy_x
+        dist_y = y - self.enemy_y
+        
+        if (0 <= dist_x < 40):
+            self.enemy_x = self.enemy_x + self.enemy_speed_range
+        if (0 >= dist_x > -40):
+            self.enemy_x = self.enemy_x - self.enemy_speed_range
+        if (0 <= dist_y < 40):
+            self.enemy_y = self.enemy_y + self.enemy_speed_range
+        if (0 >= dist_y > -40):
+            self.enemy_y = self.enemy_y - self.enemy_speed_range
+            
+        global tempx, tempy
+        tempx = self.enemy_x
+        tempy = self.enemy_y
+
+        pygame.draw.circle(screen, self.color, (self.enemy_x, self.enemy_y), self.enemy_size_range, 0)
         
 
 while True:
@@ -111,28 +142,41 @@ while True:
             
     direction = pygame.key.get_pressed()
           
-    if (once1 == 0):
+    if (once == 0):
+        
+        enemy_x_dict = {}
+        enemy_y_dict = {}
+        enemy_speed_dict = {}    
+        enemy_size_dict = {}
         enemy_dict = {}
+        
         for i in range(0, enemy_count):
-            enemy_dict[('enemy%s' % i).format(i)] = None
-            once1 = 1
-            
-    if (once2 == 0):
-        enemy_dict = {}
+            x_init = random.randint(50, 950)
+            enemy_x_dict[('enemy_x%s' % i).format(i)] = x_init
+        for i in range(0, enemy_count):
+            y_init = random.randint(50, 450)
+            enemy_y_dict[('enemy_y%s' % i).format(i)] = y_init
         for i in range(0, enemy_count):
             enemy_dict[('enemy_class%s' % i).format(i)] = None
-            once2 = 1
-            
-    if (once3 == 0):
-        enemy_dict = {}
         for i in range(0, enemy_count):
-            enemy_dict[('enemy_class%s' % i).format(i)] = None
-            once3 = 1
+            size = random.randint(5, enemy_size)
+            enemy_size_dict[('enemy_size%s' % i).format(i)] = size
+        for i in range(0, enemy_count):
+            speed = random.randint(0, enemy_speed)
+            enemy_speed_dict[('enemy_speed%s' % i).format(i)] = speed
+            
+            once = 1
+        
+    if (once == 2):
+        for i in range(0, enemy_count):
+            enemy_x_dict[('enemy_x%s' % i).format(i)] = tempx
+        for i in range(0, enemy_count):
+            enemy_y_dict[('enemy_y%s' % i).format(i)] = tempy
         
     gameboard(5)
     sprite = Sprite(10, 5, 10, direction)
     for i in range(0, enemy_count):
-        enemy_dict[('enemy_count%s' % i)] = Enemy((('enemy_x')%s), (('enemy_y')%s), 20, 10, white) 
+        enemy_dict[('enemy_class%s' % i)] = Enemy(enemy_x_dict.get('enemy_x%s' % i), enemy_y_dict.get('enemy_y%s' % i), enemy_size_dict.get('enemy_size%s' % i), enemy_speed_dict.get('enemy_speed%s' % i), red) 
             
     pygame.display.flip()
     clock.tick(30)
