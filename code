@@ -2,6 +2,8 @@ import pygame
 import random
 from pygame.locals import *
 
+# ADD FOOD, DICE, TITLE, ENVIRONMENTS, HELP PAGE
+
 pygame.init()
 
 screen = pygame.display.set_mode((1000,500))
@@ -15,6 +17,7 @@ white = (255,255,255)
 black = (0,0,0)
 blue = (0, 102, 204)
 red = (255,0,0)
+orange = (255, 204, 0)
 
 x = random.randint(100, 1000)
 y = random.randint(100, 400)
@@ -25,7 +28,9 @@ enemy_size = 20
 enemy_speed = 3
 ready = 750
 once = 0
+food_count = 20
 i = 0
+j = 0
 
 clock = pygame.time.Clock()
 
@@ -78,7 +83,6 @@ class Sprite:
             direct = 'left'        
 
         if direction[pygame.K_SPACE]:
-            
             if (ready >= 750):
                 if (direct == 'up'):
                     self.y = self.y - (self.sprite_sprint_length)
@@ -89,7 +93,6 @@ class Sprite:
                 if (direct == 'left'):
                     self.x = self.x - (self.sprite_sprint_length)        
                 ready = 0
-                
         if (ready < 750):
             ready = ready + 1
             
@@ -132,11 +135,22 @@ class Enemy:
             if (dist_y < -5 and dist_y >= -100):
                 enemy_y_dict[('enemy_y%s' % i).format(i)] = enemy_y_dict.get('enemy_y%s' % i) + self.enemy_speed_range
             
-        pygame.draw.circle(screen, self.color, (enemy_x_dict.get('enemy_x%s' % i), enemy_y_dict.get('enemy_y%s' % i)), self.enemy_size_range, 0)        
-
+        pygame.draw.circle(screen, self.color, (enemy_x_dict.get('enemy_x%s' % i), enemy_y_dict.get('enemy_y%s' % i)), self.enemy_size_range, 0)
+        
         i = i + 1
         if (i >= enemy_count):
             i = 0
+        
+class Food:
+    def __init__(self, color):
+        global food_x_dict, food_y_dict, x, y, j
+        self.color = color
+                
+        pygame.draw.circle(screen, self.color, (food_x_dict.get('food_x%s' % j), food_y_dict.get('food_y%s' % j)), 10, 0)
+                
+        j = j + 1
+        if (j >= enemy_count):
+            j = 0
         
 while True:
     for event in pygame.event.get():
@@ -152,6 +166,9 @@ while True:
         enemy_speed_dict = {}    
         enemy_size_dict = {}
         enemy_dict = {}
+        food_x_dict = {}
+        food_y_dict = {}
+        food_dict = {}
         
         for i in range(0, enemy_count):
             x_init = random.randint(50, 950)
@@ -167,6 +184,14 @@ while True:
         for i in range(0, enemy_count):
             speed = random.randint(1, enemy_speed)
             enemy_speed_dict[('enemy_speed%s' % i).format(i)] = speed
+        for j in range(0, food_count):
+            food_x_init = random.randint(50, 950)
+            food_x_dict[('food_x%s' % j).format(i)] = food_x_init
+        for j in range(0, food_count):
+            food_y_init = random.randint(50, 450)
+            food_y_dict[('food_y%s' % j).format(i)] = food_y_init
+        for j in range(0, food_count):
+            food_dict[('food_class%s' % j).format(i)] = None
             
             once = 1
                         
@@ -178,6 +203,8 @@ while True:
     sprite = Sprite(10, 5, 400, direction)
     for i in range(0, enemy_count):
         enemy_dict[('enemy_class%s' % i)] = Enemy(enemy_size_dict.get('enemy_size%s' % i), enemy_speed_dict.get('enemy_speed%s' % i), red) 
+    for j in range(0, food_count):
+        food_dict[('food_class%s' % j)] = Food(orange) 
             
     pygame.display.flip()
     clock.tick(30)
