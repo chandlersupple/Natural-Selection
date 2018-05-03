@@ -23,6 +23,7 @@ direct = 'up'
 enemy_count = 5
 enemy_size = 20
 enemy_speed = 3
+ready = 750
 once = 0
 i = 0
 
@@ -55,7 +56,7 @@ def gameboard(roll):
     
 class Sprite:
     def __init__(self, sprite_size, sprite_speed, sprite_sprint_length, direction):
-        global x, y, direct
+        global x, y, direct, ready
         self.sprite_size = sprite_size
         self.sprite_speed = sprite_speed
         self.sprite_sprint_length = sprite_sprint_length
@@ -77,18 +78,20 @@ class Sprite:
             direct = 'left'        
 
         if direction[pygame.K_SPACE]:
-            if (direct == 'up'):
-                if (1/(sprite_sprint_length * 1000) < 1):
-                    self.y = self.y - (3 * self.sprite_speed)
-            if (direct == 'down'):
-                if (1/(sprite_sprint_length * 1000) < 1):
-                    self.y = self.y + (3 * self.sprite_speed)
-            if (direct == 'right'):
-                if (1/(sprite_sprint_length * 1000) < 1):
-                    self.x = self.x + (3 * self.sprite_speed)
-            if (direct == 'left'):
-                if (1/(sprite_sprint_length * 1000) < 1):
-                    self.x = self.x - (3 * self.sprite_speed)
+            
+            if (ready >= 750):
+                if (direct == 'up'):
+                    self.y = self.y - (self.sprite_sprint_length)
+                if (direct == 'down'):
+                    self.y = self.y + (self.sprite_sprint_length)
+                if (direct == 'right'):
+                    self.x = self.x + (self.sprite_sprint_length)
+                if (direct == 'left'):
+                    self.x = self.x - (self.sprite_sprint_length)        
+                ready = 0
+                
+        if (ready < 750):
+            ready = ready + 1
             
         if (self.x > 1000):
             self.x = 1000
@@ -115,18 +118,18 @@ class Enemy:
         dist_x = enemy_x_dict.get('enemy_x%s' % i) - x
         dist_y = enemy_y_dict.get('enemy_y%s' % i) - y
             
-        if (dist_x > 0 and dist_x <= 75):
+        if (dist_x > 5 and dist_x <= 100):
             enemy_x_dict[('enemy_x%s' % i).format(i)] = enemy_x_dict.get('enemy_x%s' % i) - self.enemy_speed_range
-            if (dist_y > 0 and dist_y <= 75):
+            if (dist_y > 5 and dist_y <= 100):
                 enemy_y_dict[('enemy_y%s' % i).format(i)] = enemy_y_dict.get('enemy_y%s' % i) - self.enemy_speed_range
-            if (dist_y < 0 and dist_y >= -75):
+            if (dist_y < -5 and dist_y >= -100):
                 enemy_y_dict[('enemy_y%s' % i).format(i)] = enemy_y_dict.get('enemy_y%s' % i) + self.enemy_speed_range
             
-        if (dist_x < 0 and dist_y >= -75):
+        if (dist_x < -5 and dist_y >= -100):
             enemy_x_dict[('enemy_x%s' % i).format(i)] = enemy_x_dict.get('enemy_x%s' % i) + self.enemy_speed_range
-            if (dist_y > 0 and dist_y <= 75):
+            if (dist_y > 5 and dist_y <= 100):
                 enemy_y_dict[('enemy_y%s' % i).format(i)] = enemy_y_dict.get('enemy_y%s' % i) - self.enemy_speed_range
-            if (dist_y < 0 and dist_y >= -75):
+            if (dist_y < -5 and dist_y >= -100):
                 enemy_y_dict[('enemy_y%s' % i).format(i)] = enemy_y_dict.get('enemy_y%s' % i) + self.enemy_speed_range
             
         pygame.draw.circle(screen, self.color, (enemy_x_dict.get('enemy_x%s' % i), enemy_y_dict.get('enemy_y%s' % i)), self.enemy_size_range, 0)        
@@ -172,7 +175,7 @@ while True:
 #    print('y: %s' %y)
         
     gameboard(5)
-    sprite = Sprite(10, 5, 10, direction)
+    sprite = Sprite(10, 5, 400, direction)
     for i in range(0, enemy_count):
         enemy_dict[('enemy_class%s' % i)] = Enemy(enemy_size_dict.get('enemy_size%s' % i), enemy_speed_dict.get('enemy_speed%s' % i), red) 
             
