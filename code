@@ -23,6 +23,7 @@ dark_grey = (61, 61, 41)
 lime = (0,255,0)
 purple = (102, 0, 235)
 yellow = (255, 255, 0)
+green = (0, 204, 0)
 
 x = random.randint(200, 800) 
 y = random.randint(100, 400) 
@@ -86,16 +87,16 @@ def gameboard(roll):
 def env(color):
 
     for i in range(0, 12):
-        pygame.draw.rect(screen, orange_brown, (0, ((i * 20) + (i * 20) + 20), 20, 20), 0)
-        pygame.draw.rect(screen, brown, (980, ((i * 20) + (i * 20) + 20), 20, 20), 0)
-        pygame.draw.rect(screen, brown, (0, ((i * 20) + (i * 20)), 20, 20), 0)
-        pygame.draw.rect(screen, orange_brown, (980, ((i * 20) + (i * 20)), 20, 20), 0)
+        pygame.draw.rect(screen, black, (0, ((i * 20) + (i * 20) + 20), 20, 20), 0)
+        pygame.draw.rect(screen, white, (980, ((i * 20) + (i * 20) + 20), 20, 20), 0)
+        pygame.draw.rect(screen, white, (0, ((i * 20) + (i * 20)), 20, 20), 0)
+        pygame.draw.rect(screen, black, (980, ((i * 20) + (i * 20)), 20, 20), 0)
 
     for i in range(0, 25):
-        pygame.draw.rect(screen, orange_brown, (((i * 20) + (i * 20) + 20), 0, 20, 20), 0)
-        pygame.draw.rect(screen, orange_brown, (((i * 20) + (i * 20) + 20), 480, 20, 20), 0)
-        pygame.draw.rect(screen, brown, (((i * 20) + (i * 20)), 0, 20, 20), 0)
-        pygame.draw.rect(screen, brown, (((i * 20) + (i * 20)), 480, 20, 20), 0)
+        pygame.draw.rect(screen, black, (((i * 20) + (i * 20) + 20), 0, 20, 20), 0)
+        pygame.draw.rect(screen, black, (((i * 20) + (i * 20) + 20), 480, 20, 20), 0)
+        pygame.draw.rect(screen, white, (((i * 20) + (i * 20)), 0, 20, 20), 0)
+        pygame.draw.rect(screen, white, (((i * 20) + (i * 20)), 480, 20, 20), 0)
 
         pygame.draw.rect(screen, color, (20, 20, 960, 460), 0)
 
@@ -161,9 +162,9 @@ class Enemy:
         dist_x = enemy_x_dict.get('enemy_x%s' % i) - x
         dist_y = enemy_y_dict.get('enemy_y%s' % i) - y
         # AND SIZE IS LESS THAN SPRITE (IN TERMS OF RADIUS)
-        if (dist_x > 5 and dist_x <= 300):
+        if (dist_x > 5 and dist_x <= 360):
             enemy_x_dict[('enemy_x%s' % i).format(i)] = enemy_x_dict.get('enemy_x%s' % i) - self.enemy_speed_range
-        if (dist_x < -5 and dist_y >= -300):
+        if (dist_x < -5 and dist_y >= -360):
             enemy_x_dict[('enemy_x%s' % i).format(i)] = enemy_x_dict.get('enemy_x%s' % i) + self.enemy_speed_range
         if (dist_y > 5 and dist_y <= 200):
             enemy_y_dict[('enemy_y%s' % i).format(i)] = enemy_y_dict.get('enemy_y%s' % i) - self.enemy_speed_range
@@ -229,7 +230,8 @@ while True:
         if event.type == pygame.QUIT: pygame.display.quit()
     
     if (player_roll == 0):
-        roll = random.randint(1,5)
+        #roll = random.randint(1,5)
+        roll = 4
         start_roll = pygame.key.get_pressed()
         if start_roll[pygame.K_r]:
             player_roll = 1
@@ -279,13 +281,34 @@ while True:
 
             once = 1
                     
-        env(purple)
+        if (roll == 1):
+            env_color = purple
+            food_color = yellow
+            enemy_color = red
+        if (roll == 2):
+            env_color = green
+            food_color = blue
+            enemy_color = yellow
+        if (roll == 3):
+            env_color = red
+            food_color = purple
+            enemy_color = blue
+        if (roll == 4): # mudlside
+            env_color = brown
+            food_color = orange_brown
+            enemy_color = light_backing
+        if (roll == 5): # smog
+            env_color = white
+            food_color = black
+            enemy_color = grey
+            
+        env(env_color)
         profile(score, health, ready)
         sprite = Sprite(10, 5, 200, direction)
         for i in range(0, enemy_count):
-            enemy_dict[('enemy_class%s' % i)] = Enemy(enemy_size_dict.get('enemy_size%s' % i), enemy_speed_dict.get('enemy_speed%s' % i), red) 
+            enemy_dict[('enemy_class%s' % i)] = Enemy(enemy_size_dict.get('enemy_size%s' % i), enemy_speed_dict.get('enemy_speed%s' % i), enemy_color) 
         for j in range(0, food_count):
-            food_dict[('food_class%s' % j)] = Food(orange) 
+            food_dict[('food_class%s' % j)] = Food(food_color) 
             
     pygame.display.flip()
     clock.tick(30)
