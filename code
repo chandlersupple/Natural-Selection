@@ -31,7 +31,7 @@ begin = 0
 direct = 'up'
 enemy_count = 7
 enemy_size = 20
-enemy_speed = 4
+enemy_speed = 3
 ready = 750 
 once = 0 
 i = 0 
@@ -46,6 +46,8 @@ score = 0
 power = 0 
 time = 0
 health = 0
+
+player_roll = 0
 
 verdana_font = pygame.font.SysFont("verdana", 42) 
 score_font = pygame.font.SysFont("verdana", 15) 
@@ -225,8 +227,14 @@ def profile(score, health, ready):
 while True: 
     for event in pygame.event.get(): 
         if event.type == pygame.QUIT: pygame.display.quit()
-            
-    gameboard(1)
+    
+    if (player_roll == 0):
+        roll = random.randint(1,5)
+        start_roll = pygame.key.get_pressed()
+        if start_roll[pygame.K_r]:
+            player_roll = 1
+    
+    gameboard(roll)
             
     start_space = pygame.key.get_pressed()
     if start_space[pygame.K_SPACE]:
@@ -255,7 +263,7 @@ while True:
             for i in range(0, enemy_count):
                 enemy_dict[('enemy_class%s' % i).format(i)] = None
             for i in range(0, enemy_count):
-                size = random.randint(5, enemy_size)
+                size = random.randint(7, enemy_size)
                 enemy_size_dict[('enemy_size%s' % i).format(i)] = size
             for i in range(0, enemy_count):
                 speed = random.randint(1, enemy_speed)
@@ -270,7 +278,7 @@ while True:
                 food_dict[('food_class%s' % j).format(j)] = None
 
             once = 1
-        
+                    
         env(purple)
         profile(score, health, ready)
         sprite = Sprite(10, 5, 200, direction)
