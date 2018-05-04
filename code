@@ -21,15 +21,17 @@ orange = (255, 204, 0)
 grey = (214, 214, 194)
 dark_grey = (61, 61, 41)
 lime = (0,255,0)
+purple = (102, 0, 235)
+yellow = (255, 255, 0)
 
-x = random.randint(100, 1000) 
+x = random.randint(200, 800) 
 y = random.randint(100, 400) 
 begin = 0
 
 direct = 'up'
-enemy_count = 25
-enemy_size = 5
-enemy_speed = 10
+enemy_count = 7
+enemy_size = 20
+enemy_speed = 4
 ready = 750 
 once = 0 
 i = 0 
@@ -46,7 +48,7 @@ time = 0
 health = 0
 
 verdana_font = pygame.font.SysFont("verdana", 42) 
-score_font = pygame.font.SysFont("verdana", 24) 
+score_font = pygame.font.SysFont("verdana", 15) 
 title_in_verdana = verdana_font.render("Natural Selection", False, (brown))
 
 clock = pygame.time.Clock()
@@ -79,6 +81,22 @@ def gameboard(roll):
     dice_number = verdana_font.render(str(roll), False, (brown))
     screen.blit(dice_number, (876, 83))    
 
+def env(color):
+
+    for i in range(0, 12):
+        pygame.draw.rect(screen, orange_brown, (0, ((i * 20) + (i * 20) + 20), 20, 20), 0)
+        pygame.draw.rect(screen, brown, (980, ((i * 20) + (i * 20) + 20), 20, 20), 0)
+        pygame.draw.rect(screen, brown, (0, ((i * 20) + (i * 20)), 20, 20), 0)
+        pygame.draw.rect(screen, orange_brown, (980, ((i * 20) + (i * 20)), 20, 20), 0)
+
+    for i in range(0, 25):
+        pygame.draw.rect(screen, orange_brown, (((i * 20) + (i * 20) + 20), 0, 20, 20), 0)
+        pygame.draw.rect(screen, orange_brown, (((i * 20) + (i * 20) + 20), 480, 20, 20), 0)
+        pygame.draw.rect(screen, brown, (((i * 20) + (i * 20)), 0, 20, 20), 0)
+        pygame.draw.rect(screen, brown, (((i * 20) + (i * 20)), 480, 20, 20), 0)
+
+        pygame.draw.rect(screen, color, (20, 20, 960, 460), 0)
+
 class Sprite: 
     def __init__(self, sprite_size, sprite_speed, sprite_sprint_length, direction): 
         global x, y, direct, ready 
@@ -103,7 +121,7 @@ class Sprite:
             direct = 'left'        
 
         if direction[pygame.K_SPACE]:
-            if (ready >= 750):
+            if (ready >= 765):
                 if (direct == 'up'):
                     self.y = self.y - (self.sprite_sprint_length)
                 if (direct == 'down'):
@@ -113,7 +131,7 @@ class Sprite:
                 if (direct == 'left'):
                     self.x = self.x - (self.sprite_sprint_length)        
                 ready = 0
-        if (ready < 750):
+        if (ready < 765):
             ready = ready + 1
 
         if (self.x > 1000):
@@ -152,7 +170,7 @@ class Enemy:
 
         pygame.draw.circle(screen, self.color, (enemy_x_dict.get('enemy_x%s' % i), enemy_y_dict.get('enemy_y%s' % i)), self.enemy_size_range, 0)
         
-        if (abs(dist_x) <= 8 and abs(dist_y) <= 8):
+        if (abs(dist_x) <= 12 and abs(dist_y) <= 12):
             health = health + 5
         
         i = i + 1
@@ -178,34 +196,37 @@ class Food:
             j = 0
         j = j + 1
         
-def profile(score, health):
+def profile(score, health, ready):
     global power, time
     
-    pygame.draw.rect(screen, white, (5, 5, 600, 100), 0)
-    pygame.draw.rect(screen, dark_grey, (5, 5, 600, 100), 2)
+    pygame.draw.rect(screen, white, (5, 5, 600, 80), 0)
+    pygame.draw.rect(screen, dark_grey, (5, 5, 600, 80), 2)
     
-    pygame.draw.rect(screen, dark_grey, (15, 15, 515, 20), 2)
-    pygame.draw.rect(screen, dark_grey, (15, 45, 515, 20), 2)
+    pygame.draw.rect(screen, dark_grey, (15, 15, 515, 14), 2)
+    pygame.draw.rect(screen, dark_grey, (15, 32, 515, 14), 2)
+    pygame.draw.rect(screen, dark_grey, (15, 49, 515, 14), 2)
     
     if (score < 300):
-        pygame.draw.rect(screen, lime, (18, 18, (round(int(score * 1.7))), 15), 0)
+        pygame.draw.rect(screen, lime, (18, 18, (round(int(score * 1.7))), 9), 0)
     if (score >= 300):
-        pygame.draw.rect(screen, lime, (18, 18, 510, 15), 0)
+        pygame.draw.rect(screen, lime, (18, 18, 510, 9), 0)
+    if (ready < 750):
+        pygame.draw.rect(screen, yellow, (18, 35, (round(int(ready / 1.5))), 9), 0)
+    if (ready >= 750):
+        pygame.draw.rect(screen, yellow, (18, 35, 510, 9), 0)
     if (health < 60):
-        pygame.draw.rect(screen, red, (18, 48, (510 - (health * 5)), 15), 0)
+        pygame.draw.rect(screen, red, (18, 52, (510 - (health * 5)), 9), 0)
     if (health >= 60):
-        pygame.draw.rect(screen, red, (18, 48, 0, 15), 0)
+        pygame.draw.rect(screen, red, (18, 52, 0, 9), 0)
         
     score_font_rendered = score_font.render(("Score: %s" % score), False, (dark_grey)) 
-    screen.blit(score_font_rendered, (18, 68))
-        
-#def environment():
-#    global begin, once, enemy_count, food_count, score, health, i, j
-    
+    screen.blit(score_font_rendered, (14, 63))
     
 while True: 
     for event in pygame.event.get(): 
         if event.type == pygame.QUIT: pygame.display.quit()
+            
+    gameboard(1)
             
     start_space = pygame.key.get_pressed()
     if start_space[pygame.K_SPACE]:
@@ -250,9 +271,9 @@ while True:
 
             once = 1
         
-        gameboard(5)
-        profile(score, health)
-        sprite = Sprite(10, 5, 400, direction)
+        env(purple)
+        profile(score, health, ready)
+        sprite = Sprite(10, 5, 200, direction)
         for i in range(0, enemy_count):
             enemy_dict[('enemy_class%s' % i)] = Enemy(enemy_size_dict.get('enemy_size%s' % i), enemy_speed_dict.get('enemy_speed%s' % i), red) 
         for j in range(0, food_count):
