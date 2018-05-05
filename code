@@ -29,6 +29,7 @@ light_blue = (0, 153, 204)
 x = random.randint(200, 800) 
 y = random.randint(100, 400) 
 begin = 0
+cont_pressed = 0
 
 direct = 'up'
 enemy_count = 7
@@ -40,6 +41,11 @@ i = 0
 none = None
 bigger = 1
 
+sprite_size = 10
+sprite_speed = 5
+sprite_sprint_length = 200
+power = 0
+
 food_count = 10
 j = 0 
 consumed_count = 0 
@@ -50,6 +56,7 @@ power = 0
 time = 0
 health = 0
 
+has_rolled = 0
 rolls = [1,2,3,4,5]
 player_roll = 0
 
@@ -86,6 +93,8 @@ def gameboard(roll):
 
     dice_number = verdana_font.render(str(roll), False, (brown))
     screen.blit(dice_number, (876, 83))    
+    
+    # env info on tiles
 
 def env(color):
 
@@ -156,7 +165,7 @@ class Sprite:
         
 class Enemy: 
     def __init__(self, enemy_size_range, enemy_speed_range, color): 
-        global x, y, i, once, enemy_x_dict, enemy_y_dict, enemy_count, health, bigger
+        global x, y, i, once, enemy_x_dict, enemy_y_dict, enemy_count, health, bigger, sprite_size
 
         self.enemy_size_range = enemy_size_range
         self.enemy_speed_range = enemy_speed_range
@@ -165,9 +174,9 @@ class Enemy:
         dist_x = enemy_x_dict.get('enemy_x%s' % i) - x
         dist_y = enemy_y_dict.get('enemy_y%s' % i) - y
         
-        if (self.enemy_size_range > 10):
+        if (self.enemy_size_range > sprite_size):
             bigger = 1
-        if (self.enemy_size_range <= 10):
+        if (self.enemy_size_range <= sprite_size):
             bigger = 0
         
         if (dist_x > 5 and dist_x <= 400):
@@ -233,10 +242,77 @@ def profile(score, health, ready):
     score_font_rendered = score_font.render(("Score: %s" % score), False, (dark_grey)) 
     screen.blit(score_font_rendered, (14, 63))
     
+def upgrade_info():
+    global sprite_size, sprite_speed, sprite_sprint_length, power
+    pygame.draw.rect(screen, white, (0,0,1000,500), 0)
+    for i in range(0, 12):
+        pygame.draw.rect(screen, black, (0, ((i * 20) + (i * 20) + 20), 20, 20), 0)
+        pygame.draw.rect(screen, white, (980, ((i * 20) + (i * 20) + 20), 20, 20), 0)
+        pygame.draw.rect(screen, white, (0, ((i * 20) + (i * 20)), 20, 20), 0)
+        pygame.draw.rect(screen, black, (980, ((i * 20) + (i * 20)), 20, 20), 0)
+
+    for i in range(0, 25):
+        pygame.draw.rect(screen, black, (((i * 20) + (i * 20) + 20), 0, 20, 20), 0)
+        pygame.draw.rect(screen, black, (((i * 20) + (i * 20) + 20), 480, 20, 20), 0)
+        pygame.draw.rect(screen, white, (((i * 20) + (i * 20)), 0, 20, 20), 0)
+        pygame.draw.rect(screen, white, (((i * 20) + (i * 20)), 480, 20, 20), 0)
+        
+    pygame.draw.rect(screen, black, (150, 100, 100, 50), 0)
+    speed_minus = pygame.Rect(150, 100, 100, 50)
+    pygame.draw.rect(screen, black, (300, 100, 100, 50), 0)
+    speed_plus = pygame.Rect(350, 100, 100, 50)
+            
+    pygame.draw.rect(screen, black, (150, 200, 100, 50), 0)
+    size_minus = pygame.Rect(150, 200, 100, 50)
+    pygame.draw.rect(screen, black, (300, 200, 100, 50), 0)
+    size_plus = pygame.Rect(300, 200, 100, 50)
+            
+    pygame.draw.rect(screen, black, (150, 300, 100, 50), 0)
+    sprint_minus = pygame.Rect(150, 300, 100, 50)
+    pygame.draw.rect(screen, black, (300, 300, 100, 50), 0)
+    sprint_plus = pygame.Rect(300, 300, 100, 50)
+        
+    pygame.draw.rect(screen, black, (450, 100, 400, 300), 3)
+    pygame.draw.circle(screen, blue, (650,250), sprite_size, 0)
+    
+    if (power >= 1):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if (event.button == 1):
+                if (speed_minus.collidepoint(event.pos)):
+                    sprite_speed = sprite_speed - 2
+                    power = power - 1
+            if (event.button == 1):
+                if (speed_plus.collidepoint(event.pos)):
+                    sprite_speed = sprite_speed + 2
+                    power = power - 1
+            if (event.button == 1):
+                if (size_minus.collidepoint(event.pos)):
+                    if (sprite_size >= 6):
+                        sprite_size = sprite_size - 5
+                        power = power - 1
+            if (event.button == 1):
+                if (size_plus.collidepoint(event.pos)):
+                    sprite_size = sprite_size + 5
+                    power = power - 1
+            if (event.button == 1):
+                if (sprint_minus.collidepoint(event.pos)):
+                    sprite_sprint_length = sprite_sprint_length - 50
+                    power = power - 1
+            if (event.button == 1):
+                if (sprint_plus.collidepoint(event.pos)):
+                    sprite_sprint_length = sprite_sprint_length + 50
+                    power = power - 1
+            
 while True: 
     for event in pygame.event.get(): 
         if event.type == pygame.QUIT: 
             pygame.display.quit()
+    
+    if (begin == 2 and has_rolled == 0):
+        upgrade_info()
+        cont = pygame.key.get_pressed()
+        if cont[pygame.K_c]:
+            player_roll = 0
     
     if (player_roll == 0):
         if (len(rolls) == 0):
@@ -247,10 +323,11 @@ while True:
     
         start_roll = pygame.key.get_pressed()
         if start_roll[pygame.K_r]:
+            has_rolled = 1
             player_roll = 1
             rolls.pop(rolled)
-    
-    gameboard(roll)
+        
+        gameboard(roll)
             
     start_space = pygame.key.get_pressed()
     if start_space[pygame.K_SPACE]:
@@ -339,8 +416,11 @@ while True:
         if (score >= 300 or health >= 60):
             if (health >= 60):
                 rolls.append(roll)
-            begin = 0
-            player_roll = 0
+            if (score >= 300):
+                power = power + 1
+            has_rolled = 0
+            begin = 2
+            player_roll = 1
             score = 0
             once = 0
             health = 0
@@ -350,7 +430,7 @@ while True:
             
         env(env_color)
         profile(score, health, ready)
-        sprite = Sprite(10, 5, 200, direction)
+        sprite = Sprite(sprite_size, sprite_speed, sprite_sprint_length, direction)
         for i in range(0, enemy_count):
             enemy_dict[('enemy_class%s' % i)] = Enemy(enemy_size_dict.get('enemy_size%s' % i), enemy_speed_dict.get('enemy_speed%s' % i), enemy_color) 
         for j in range(0, food_count):
