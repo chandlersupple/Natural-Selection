@@ -257,6 +257,14 @@ def upgrade_info():
         pygame.draw.rect(screen, white, (((i * 20) + (i * 20)), 0, 20, 20), 0)
         pygame.draw.rect(screen, white, (((i * 20) + (i * 20)), 480, 20, 20), 0)
         
+    speed_text = score_font.render("Speed:", False, (dark_grey)) 
+    size_text = score_font.render("Size:", False, (dark_grey)) 
+    sprint_length_text = score_font.render("Sprint Length:", False, (dark_grey)) 
+        
+    screen.blit(speed_text, (150, 80))
+    screen.blit(size_text, (150, 180))
+    screen.blit(sprint_length_text, (150, 280))
+        
     pygame.draw.rect(screen, black, (150, 100, 100, 50), 0)
     speed_minus = pygame.Rect(150, 100, 100, 50)
     pygame.draw.rect(screen, black, (300, 100, 100, 50), 0)
