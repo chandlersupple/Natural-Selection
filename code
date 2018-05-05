@@ -3,7 +3,6 @@ import pygame
 import random 
 from pygame.locals import *
 
-# ADD FOOD, DICE, TITLE, ENVIRONMENTS, HELP PAGE
 pygame.init()
 
 screen = pygame.display.set_mode((1000,500)) 
@@ -24,6 +23,8 @@ lime = (0,255,0)
 purple = (102, 0, 235)
 yellow = (255, 255, 0)
 green = (0, 204, 0)
+sand = (255, 219, 77)
+light_blue = (0, 153, 204)
 
 x = random.randint(200, 800) 
 y = random.randint(100, 400) 
@@ -37,6 +38,7 @@ ready = 750
 once = 0 
 i = 0 
 none = None
+bigger = 1
 
 food_count = 10
 j = 0 
@@ -48,6 +50,7 @@ power = 0
 time = 0
 health = 0
 
+rolls = [1,2,3,4,5]
 player_roll = 0
 
 verdana_font = pygame.font.SysFont("verdana", 42) 
@@ -153,7 +156,7 @@ class Sprite:
         
 class Enemy: 
     def __init__(self, enemy_size_range, enemy_speed_range, color): 
-        global x, y, i, once, enemy_x_dict, enemy_y_dict, enemy_count, health
+        global x, y, i, once, enemy_x_dict, enemy_y_dict, enemy_count, health, bigger
 
         self.enemy_size_range = enemy_size_range
         self.enemy_speed_range = enemy_speed_range
@@ -161,19 +164,24 @@ class Enemy:
 
         dist_x = enemy_x_dict.get('enemy_x%s' % i) - x
         dist_y = enemy_y_dict.get('enemy_y%s' % i) - y
-        # AND SIZE IS LESS THAN SPRITE (IN TERMS OF RADIUS)
-        if (dist_x > 5 and dist_x <= 360):
+        
+        if (self.enemy_size_range > 10):
+            bigger = 1
+        if (self.enemy_size_range <= 10):
+            bigger = 0
+        
+        if (dist_x > 5 and dist_x <= 400):
             enemy_x_dict[('enemy_x%s' % i).format(i)] = enemy_x_dict.get('enemy_x%s' % i) - self.enemy_speed_range
-        if (dist_x < -5 and dist_y >= -360):
+        if (dist_x < -5 and dist_y >= -400):
             enemy_x_dict[('enemy_x%s' % i).format(i)] = enemy_x_dict.get('enemy_x%s' % i) + self.enemy_speed_range
-        if (dist_y > 5 and dist_y <= 200):
+        if (dist_y > 5 and dist_y <= 250):
             enemy_y_dict[('enemy_y%s' % i).format(i)] = enemy_y_dict.get('enemy_y%s' % i) - self.enemy_speed_range
-        if (dist_y < -5 and dist_y >= -200):
+        if (dist_y < -5 and dist_y >= -250):
             enemy_y_dict[('enemy_y%s' % i).format(i)] = enemy_y_dict.get('enemy_y%s' % i) + self.enemy_speed_range
-
+            
         pygame.draw.circle(screen, self.color, (enemy_x_dict.get('enemy_x%s' % i), enemy_y_dict.get('enemy_y%s' % i)), self.enemy_size_range, 0)
         
-        if (abs(dist_x) <= 12 and abs(dist_y) <= 12):
+        if (abs(dist_x) <= 15 and abs(dist_y) <= 15 and bigger == 1):
             health = health + 5
         
         i = i + 1
@@ -227,23 +235,70 @@ def profile(score, health, ready):
     
 while True: 
     for event in pygame.event.get(): 
-        if event.type == pygame.QUIT: pygame.display.quit()
+        if event.type == pygame.QUIT: 
+            pygame.display.quit()
     
     if (player_roll == 0):
-        #roll = random.randint(1,5)
-        roll = 4
+        if (len(rolls) == 0):
+            while(1):
+                gameboard(0)
+        rolled = random.randint(0,(len(rolls) - 1))
+        roll = rolls[rolled]
+    
         start_roll = pygame.key.get_pressed()
         if start_roll[pygame.K_r]:
             player_roll = 1
+            rolls.pop(rolled)
     
     gameboard(roll)
             
     start_space = pygame.key.get_pressed()
     if start_space[pygame.K_SPACE]:
         begin = 1
-
+    
     if (begin == 1):
         direction = pygame.key.get_pressed()
+        
+        if (roll == 1): # grassy meadow
+            enemy_count = 5
+            enemy_size = 20
+            enemy_speed = 3
+            env_color = green
+            food_color = orange
+            enemy_color = yellow
+            food_count = 15
+        if (roll == 2): # flood
+            enemy_count = 6
+            enemy_size = 20
+            enemy_speed = 4
+            env_color = light_blue
+            food_color = black
+            enemy_color = dark_grey
+            food_count = 8
+        if (roll == 5): # famine
+            enemy_count = 15
+            enemy_size = 30
+            enemy_speed = 5
+            env_color = light_backing
+            food_color = black
+            enemy_color = sand
+            food_count = 3
+        if (roll == 3): # mudlside
+            enemy_count = 7
+            enemy_size = 20
+            enemy_speed = 4
+            env_color = brown
+            food_color = orange_brown
+            enemy_color = light_backing
+            food_count = 5
+        if (roll == 4): # smog
+            enemy_count = 6
+            enemy_size = 30
+            enemy_speed = 5
+            env_color = white
+            food_color = black
+            enemy_color = grey
+            food_count = 10
                 
         if (once == 0):
 
@@ -265,7 +320,7 @@ while True:
             for i in range(0, enemy_count):
                 enemy_dict[('enemy_class%s' % i).format(i)] = None
             for i in range(0, enemy_count):
-                size = random.randint(7, enemy_size)
+                size = random.randint(8, enemy_size)
                 enemy_size_dict[('enemy_size%s' % i).format(i)] = size
             for i in range(0, enemy_count):
                 speed = random.randint(1, enemy_speed)
@@ -280,27 +335,18 @@ while True:
                 food_dict[('food_class%s' % j).format(j)] = None
 
             once = 1
-                    
-        if (roll == 1):
-            env_color = purple
-            food_color = yellow
-            enemy_color = red
-        if (roll == 2):
-            env_color = green
-            food_color = blue
-            enemy_color = yellow
-        if (roll == 3):
-            env_color = red
-            food_color = purple
-            enemy_color = blue
-        if (roll == 4): # mudlside
-            env_color = brown
-            food_color = orange_brown
-            enemy_color = light_backing
-        if (roll == 5): # smog
-            env_color = white
-            food_color = black
-            enemy_color = grey
+            
+        if (score >= 300 or health >= 60):
+            if (health >= 60):
+                rolls.append(roll)
+            begin = 0
+            player_roll = 0
+            score = 0
+            once = 0
+            health = 0
+            x = random.randint(200, 800) 
+            y = random.randint(100, 400)
+            ready = 765
             
         env(env_color)
         profile(score, health, ready)
