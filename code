@@ -41,10 +41,10 @@ i = 0
 none = None
 bigger = 1
 
-sprite_size = 
+sprite_size = 10
 sprite_speed = 5
-sprite_sprint_length = 1000
-power = 100
+sprite_sprint_length = 250
+power = 0
 
 food_count = 10
 j = 0 
@@ -420,9 +420,6 @@ try:
                     rolls.append(roll)
                 if (score >= 300):
                     power = power + 1
-        #        if ((len(rolls) - 1) == 0):
-         #           print('Game Over')
-          #          pygame.display.quit()
                 has_rolled = 0
                 begin = 2
                 player_roll = 1
