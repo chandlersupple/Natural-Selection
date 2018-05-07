@@ -41,8 +41,8 @@ i = 0
 none = None
 bigger = 1
 
-sprite_size = 250
-sprite_speed = 20
+sprite_size = 
+sprite_speed = 5
 sprite_sprint_length = 1000
 power = 100
 
@@ -59,8 +59,6 @@ health = 0
 has_rolled = 0
 rolls = [0,1,2,3,4,5]
 player_roll = 0
-
-quit = 0
 
 verdana_font = pygame.font.SysFont("verdana", 42) 
 score_font = pygame.font.SysFont("verdana", 15) 
@@ -308,140 +306,143 @@ def upgrade_info():
                     sprite_sprint_length = sprite_sprint_length + 50
                     power = power - 1
 
-while True: 
-    for event in pygame.event.get(): 
-        if event.type == pygame.QUIT: 
-            pygame.display.quit()
+try:
+    while True: 
+        for event in pygame.event.get(): 
+            if event.type == pygame.QUIT: 
+                pygame.display.quit()
 
-    if (begin == 2 and has_rolled == 0):
-        upgrade_info()
-        cont = pygame.key.get_pressed()
-        if cont[pygame.K_c]:
-            player_roll = 0
-            
-    if ((len(rolls) - 1) == 0):
-        player_roll = 1
-        gameover()
+        if (begin == 2 and has_rolled == 0):
+            upgrade_info()
+            cont = pygame.key.get_pressed()
+            if cont[pygame.K_c]:
+                player_roll = 0
+
+        if (player_roll == 0):
+            if ((len(rolls) - 1) > 1):
+                rolled = random.randint(1,(len(rolls) - 1))
+            roll = rolls[rolled]
+
+            start_roll = pygame.key.get_pressed()
+            if start_roll[pygame.K_r]:
+                has_rolled = 1
+                player_roll = 1
+                rolls.pop(rolled)
+
+            gameboard(roll)
+
+        start_space = pygame.key.get_pressed()
+        if start_space[pygame.K_SPACE]:
+            begin = 1
+
+        if (begin == 1):
+            direction = pygame.key.get_pressed()
+
+            if (roll == 1): # grassy meadow
+                enemy_count = 5
+                enemy_size = 20
+                enemy_speed = 3
+                env_color = green
+                food_color = orange
+                enemy_color = yellow
+                food_count = 15
+            if (roll == 2): # flood
+                enemy_count = 6
+                enemy_size = 20
+                enemy_speed = 4
+                env_color = light_blue
+                food_color = black
+                enemy_color = dark_grey
+                food_count = 8
+            if (roll == 5): # famine
+                enemy_count = 10
+                enemy_size = 30
+                enemy_speed = 5
+                env_color = light_backing
+                food_color = black
+                enemy_color = sand
+                food_count = 3
+            if (roll == 3): # mudlside
+                enemy_count = 7
+                enemy_size = 20
+                enemy_speed = 4
+                env_color = brown
+                food_color = orange_brown
+                enemy_color = light_backing
+                food_count = 5
+            if (roll == 4): # smog
+                enemy_count = 6
+                enemy_size = 30
+                enemy_speed = 5
+                env_color = white
+                food_color = black
+                enemy_color = grey
+                food_count = 10
+
+            if (once == 0):
+
+                enemy_x_dict = {}
+                enemy_y_dict = {}
+                enemy_speed_dict = {}    
+                enemy_size_dict = {}
+                enemy_dict = {}
+                food_x_dict = {}
+                food_y_dict = {}
+                food_dict = {}
+
+                for i in range(0, enemy_count):
+                    x_init = random.randint(50, 950)
+                    enemy_x_dict[('enemy_x%s' % i).format(i)] = x_init
+                for i in range(0, enemy_count):
+                    y_init = random.randint(50, 450)
+                    enemy_y_dict[('enemy_y%s' % i).format(i)] = y_init
+                for i in range(0, enemy_count):
+                    enemy_dict[('enemy_class%s' % i).format(i)] = None
+                for i in range(0, enemy_count):
+                    size = random.randint(8, enemy_size)
+                    enemy_size_dict[('enemy_size%s' % i).format(i)] = size
+                for i in range(0, enemy_count):
+                    speed = random.randint(1, enemy_speed)
+                    enemy_speed_dict[('enemy_speed%s' % i).format(i)] = speed
+                for j in range(0, food_count):
+                    food_x_init = random.randint(50, 950)
+                    food_x_dict[('food_x%s' % j).format(j)] = food_x_init
+                for j in range(0, food_count):
+                    food_y_init = random.randint(50, 450)
+                    food_y_dict[('food_y%s' % j).format(j)] = food_y_init
+                for j in range(0, food_count):
+                    food_dict[('food_class%s' % j).format(j)] = None
+
+                once = 1
+
+            if (score >= 300 or health >= 60):
+                if (health >= 60):
+                    rolls.append(roll)
+                if (score >= 300):
+                    power = power + 1
+        #        if ((len(rolls) - 1) == 0):
+         #           print('Game Over')
+          #          pygame.display.quit()
+                has_rolled = 0
+                begin = 2
+                player_roll = 1
+                score = 0
+                once = 0
+                health = 0
+                x = random.randint(200, 800) 
+                y = random.randint(100, 400)
+                ready = 765
+
+            env(env_color)
+            profile(score, health, ready)
+            sprite = Sprite(sprite_size, sprite_speed, sprite_sprint_length, direction)
+            for i in range(0, enemy_count):
+                enemy_dict[('enemy_class%s' % i)] = Enemy(enemy_size_dict.get('enemy_size%s' % i), enemy_speed_dict.get('enemy_speed%s' % i), enemy_color) 
+            for j in range(0, food_count):
+                food_dict[('food_class%s' % j)] = Food(food_color) 
+
+        pygame.display.flip()
+        clock.tick(30)
     
-    if (player_roll == 0):
-        if ((len(rolls) - 1) > 1):
-            rolled = random.randint(1,(len(rolls) - 1))
-        roll = rolls[rolled]
-        
-        start_roll = pygame.key.get_pressed()
-        if start_roll[pygame.K_r]:
-            has_rolled = 1
-            player_roll = 1
-            rolls.pop(rolled)
-
-        gameboard(roll)
-
-    start_space = pygame.key.get_pressed()
-    if start_space[pygame.K_SPACE]:
-        begin = 1
-
-    if (begin == 1):
-        direction = pygame.key.get_pressed()
-
-        if (roll == 1): # grassy meadow
-            enemy_count = 5
-            enemy_size = 20
-            enemy_speed = 3
-            env_color = green
-            food_color = orange
-            enemy_color = yellow
-            food_count = 15
-        if (roll == 2): # flood
-            enemy_count = 6
-            enemy_size = 20
-            enemy_speed = 4
-            env_color = light_blue
-            food_color = black
-            enemy_color = dark_grey
-            food_count = 8
-        if (roll == 5): # famine
-            enemy_count = 10
-            enemy_size = 30
-            enemy_speed = 5
-            env_color = light_backing
-            food_color = black
-            enemy_color = sand
-            food_count = 3
-        if (roll == 3): # mudlside
-            enemy_count = 7
-            enemy_size = 20
-            enemy_speed = 4
-            env_color = brown
-            food_color = orange_brown
-            enemy_color = light_backing
-            food_count = 5
-        if (roll == 4): # smog
-            enemy_count = 6
-            enemy_size = 30
-            enemy_speed = 5
-            env_color = white
-            food_color = black
-            enemy_color = grey
-            food_count = 10
-
-        if (once == 0):
-
-            enemy_x_dict = {}
-            enemy_y_dict = {}
-            enemy_speed_dict = {}    
-            enemy_size_dict = {}
-            enemy_dict = {}
-            food_x_dict = {}
-            food_y_dict = {}
-            food_dict = {}
-
-            for i in range(0, enemy_count):
-                x_init = random.randint(50, 950)
-                enemy_x_dict[('enemy_x%s' % i).format(i)] = x_init
-            for i in range(0, enemy_count):
-                y_init = random.randint(50, 450)
-                enemy_y_dict[('enemy_y%s' % i).format(i)] = y_init
-            for i in range(0, enemy_count):
-                enemy_dict[('enemy_class%s' % i).format(i)] = None
-            for i in range(0, enemy_count):
-                size = random.randint(8, enemy_size)
-                enemy_size_dict[('enemy_size%s' % i).format(i)] = size
-            for i in range(0, enemy_count):
-                speed = random.randint(1, enemy_speed)
-                enemy_speed_dict[('enemy_speed%s' % i).format(i)] = speed
-            for j in range(0, food_count):
-                food_x_init = random.randint(50, 950)
-                food_x_dict[('food_x%s' % j).format(j)] = food_x_init
-            for j in range(0, food_count):
-                food_y_init = random.randint(50, 450)
-                food_y_dict[('food_y%s' % j).format(j)] = food_y_init
-            for j in range(0, food_count):
-                food_dict[('food_class%s' % j).format(j)] = None
-
-            once = 1
-
-        if (score >= 300 or health >= 60):
-            if (health >= 60):
-                rolls.append(roll)
-            if (score >= 300):
-                power = power + 1
-            has_rolled = 0
-            begin = 2
-            player_roll = 1
-            score = 0
-            once = 0
-            health = 0
-            x = random.randint(200, 800) 
-            y = random.randint(100, 400)
-            ready = 765
-
-        env(env_color)
-        profile(score, health, ready)
-        sprite = Sprite(sprite_size, sprite_speed, sprite_sprint_length, direction)
-        for i in range(0, enemy_count):
-            enemy_dict[('enemy_class%s' % i)] = Enemy(enemy_size_dict.get('enemy_size%s' % i), enemy_speed_dict.get('enemy_speed%s' % i), enemy_color) 
-        for j in range(0, food_count):
-            food_dict[('food_class%s' % j)] = Food(food_color) 
-
-    pygame.display.flip()
-    clock.tick(30)
+except:
+    print('Oops, it looks like an error occured...')
