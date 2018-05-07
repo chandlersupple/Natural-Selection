@@ -41,10 +41,10 @@ i = 0
 none = None
 bigger = 1
 
-sprite_size = 10
-sprite_speed = 5
-sprite_sprint_length = 200
-power = 0
+sprite_size = 250
+sprite_speed = 20
+sprite_sprint_length = 1000
+power = 100
 
 food_count = 10
 j = 0 
@@ -57,12 +57,15 @@ time = 0
 health = 0
 
 has_rolled = 0
-rolls = [1,2,3,4,5]
+rolls = [0,1,2,3,4,5]
 player_roll = 0
+
+quit = 0
 
 verdana_font = pygame.font.SysFont("verdana", 42) 
 score_font = pygame.font.SysFont("verdana", 15) 
 title_in_verdana = verdana_font.render("Natural Selection", False, (brown))
+gameover_title = verdana_font.render("Gameover", False, (brown))
 
 clock = pygame.time.Clock()
 
@@ -94,8 +97,21 @@ def gameboard(roll):
     dice_number = verdana_font.render(str(roll), False, (brown))
     screen.blit(dice_number, (876, 83))    
     
-    # env info on tiles
+def gameover():
+    for i in range(0, 12):
+        pygame.draw.rect(screen, orange_brown, (0, ((i * 20) + (i * 20) + 20), 20, 20), 0)
+        pygame.draw.rect(screen, brown, (980, ((i * 20) + (i * 20) + 20), 20, 20), 0)
+        pygame.draw.rect(screen, brown, (0, ((i * 20) + (i * 20)), 20, 20), 0)
+        pygame.draw.rect(screen, orange_brown, (980, ((i * 20) + (i * 20)), 20, 20), 0)
 
+    for i in range(0, 25):
+        pygame.draw.rect(screen, orange_brown, (((i * 20) + (i * 20) + 20), 0, 20, 20), 0)
+        pygame.draw.rect(screen, orange_brown, (((i * 20) + (i * 20) + 20), 480, 20, 20), 0)
+        pygame.draw.rect(screen, brown, (((i * 20) + (i * 20)), 0, 20, 20), 0)
+        pygame.draw.rect(screen, brown, (((i * 20) + (i * 20)), 480, 20, 20), 0)
+
+    screen.blit(gameover_title, (500, 250))  
+    
 def env(color):
 
     for i in range(0, 12):
@@ -266,19 +282,13 @@ def upgrade_info():
     screen.blit(sprint_length_text, (150, 280))
         
     pygame.draw.rect(screen, black, (150, 100, 100, 50), 0)
-    speed_minus = pygame.Rect(150, 100, 100, 50)
-    pygame.draw.rect(screen, black, (300, 100, 100, 50), 0)
-    speed_plus = pygame.Rect(350, 100, 100, 50)
+    speed_plus = pygame.Rect(150, 100, 100, 50)
             
     pygame.draw.rect(screen, black, (150, 200, 100, 50), 0)
-    size_minus = pygame.Rect(150, 200, 100, 50)
-    pygame.draw.rect(screen, black, (300, 200, 100, 50), 0)
-    size_plus = pygame.Rect(300, 200, 100, 50)
+    size_plus = pygame.Rect(150, 200, 100, 50)
             
     pygame.draw.rect(screen, black, (150, 300, 100, 50), 0)
-    sprint_minus = pygame.Rect(150, 300, 100, 50)
-    pygame.draw.rect(screen, black, (300, 300, 100, 50), 0)
-    sprint_plus = pygame.Rect(300, 300, 100, 50)
+    sprint_plus = pygame.Rect(150, 300, 100, 50)
         
     pygame.draw.rect(screen, black, (450, 100, 400, 300), 3)
     pygame.draw.circle(screen, blue, (650,250), sprite_size, 0)
@@ -286,65 +296,53 @@ def upgrade_info():
     if (power >= 1):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if (event.button == 1):
-                if (speed_minus.collidepoint(event.pos)):
-                    sprite_speed = sprite_speed - 1
-                    power = power - 1
-            if (event.button == 1):
                 if (speed_plus.collidepoint(event.pos)):
                     sprite_speed = sprite_speed + 1
                     power = power - 1
-            if (event.button == 1):
-                if (size_minus.collidepoint(event.pos)):
-                    if (sprite_size >= 6):
-                        sprite_size = sprite_size - 2
-                        power = power - 1
             if (event.button == 1):
                 if (size_plus.collidepoint(event.pos)):
                     sprite_size = sprite_size + 2
                     power = power - 1
             if (event.button == 1):
-                if (sprint_minus.collidepoint(event.pos)):
-                    sprite_sprint_length = sprite_sprint_length - 50
-                    power = power - 1
-            if (event.button == 1):
                 if (sprint_plus.collidepoint(event.pos)):
                     sprite_sprint_length = sprite_sprint_length + 50
                     power = power - 1
-            
+
 while True: 
     for event in pygame.event.get(): 
         if event.type == pygame.QUIT: 
             pygame.display.quit()
-    
-    if ((len(rolls)) == 0):
-        while(1):
-            gameboard(0)
-    
+
     if (begin == 2 and has_rolled == 0):
         upgrade_info()
         cont = pygame.key.get_pressed()
         if cont[pygame.K_c]:
             player_roll = 0
+            
+    if ((len(rolls) - 1) == 0):
+        player_roll = 1
+        gameover()
     
     if (player_roll == 0):
-        rolled = random.randint(0,(len(rolls) - 1))
+        if ((len(rolls) - 1) > 1):
+            rolled = random.randint(1,(len(rolls) - 1))
         roll = rolls[rolled]
-    
+        
         start_roll = pygame.key.get_pressed()
         if start_roll[pygame.K_r]:
             has_rolled = 1
             player_roll = 1
             rolls.pop(rolled)
-        
+
         gameboard(roll)
-            
+
     start_space = pygame.key.get_pressed()
     if start_space[pygame.K_SPACE]:
         begin = 1
-    
+
     if (begin == 1):
         direction = pygame.key.get_pressed()
-        
+
         if (roll == 1): # grassy meadow
             enemy_count = 5
             enemy_size = 20
@@ -362,7 +360,7 @@ while True:
             enemy_color = dark_grey
             food_count = 8
         if (roll == 5): # famine
-            enemy_count = 15
+            enemy_count = 10
             enemy_size = 30
             enemy_speed = 5
             env_color = light_backing
@@ -385,7 +383,7 @@ while True:
             food_color = black
             enemy_color = grey
             food_count = 10
-                
+
         if (once == 0):
 
             enemy_x_dict = {}
@@ -421,7 +419,7 @@ while True:
                 food_dict[('food_class%s' % j).format(j)] = None
 
             once = 1
-            
+
         if (score >= 300 or health >= 60):
             if (health >= 60):
                 rolls.append(roll)
@@ -436,7 +434,7 @@ while True:
             x = random.randint(200, 800) 
             y = random.randint(100, 400)
             ready = 765
-            
+
         env(env_color)
         profile(score, health, ready)
         sprite = Sprite(sprite_size, sprite_speed, sprite_sprint_length, direction)
@@ -444,6 +442,6 @@ while True:
             enemy_dict[('enemy_class%s' % i)] = Enemy(enemy_size_dict.get('enemy_size%s' % i), enemy_speed_dict.get('enemy_speed%s' % i), enemy_color) 
         for j in range(0, food_count):
             food_dict[('food_class%s' % j)] = Food(food_color) 
-            
+
     pygame.display.flip()
     clock.tick(30)
